@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hoorm | 모고후 귀사 도우미</title>
+  </head>
+  <body>
+    <h1></h1>
+    집에 갈래
+    <input type="checkbox" />
+    <button>저장</button>
+    <script>
+      const h1 = document.querySelector('h1');
+      const checkbox = document.querySelector('input');
+      const button = document.querySelector('button');
+
+      const queryString = window.location.search;
+      const params = new URLSearchParams(queryString);
+      const gcn = params.get('gcn');
+      const name = params.get('name');
+
+      if (gcn === null || name === null) {
+        window.location.href = '/';
+      }
+
+      h1.textContent = `${gcn} ${name}`;
+
+      fetch(`wherestate?gcn=${gcn}`)
+        .then((res) => res.text())
+        .then((result) => {
+          if (result === 'dorm') {
+            checkbox.checked = true;
+          }
+          if (result === 'school') {
+            checkbox.checked = false;
+          }
+        });
+
+      button.addEventListener('click', () => {
+        fetch(`/changewhere?gcn=${gcn}&check=${checkbox.checked}`)
+          .then((res) => res.text())
+          .then((result) => {
+            console.log('changed');
+          });
+      });
+    </script>
+  </body>
+</html>

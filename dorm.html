@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hoorm | 모고후 귀사 도우미</title>
+    <style>
+      td,
+      th,
+      table {
+        border: 1px solid black;
+      }
+      th {
+        width: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Hoorm | 모고후 귀사 도우미</h1>
+    <div id="floor"></div>
+    <table id="sheet">
+      <tr id="tr"></tr>
+    </table>
+  </body>
+  <script>
+    const floor = document.querySelector('#floor');
+    const sheet = document.querySelector('#sheet tbody');
+    const tr = document.querySelector('#tr');
+
+    function Card(roomnum, gcn, name, back) {
+      return [roomnum, gcn, name, back];
+    }
+
+    function Node(data, node) {
+      return { data, node };
+    }
+
+    function TreeNode(left, data, right) {
+      return { left, data, right };
+    }
+
+    function removeRows() {
+      const trs = Array.from(sheet.querySelectorAll('tr'));
+      trs.shift();
+      for (let tr of trs) {
+        tr.remove();
+      }
+    }
+
+    function changeFloor(linkedList, i) {
+      let current = linkedList;
+      let count = 1;
+      while (current !== null) {
+        if (i === 0 || parseInt(current.data[0] / 100) === i) {
+          const tr = document.createElement('tr');
+          for (let value of [count, ...current.data]) {
+            const td = document.createElement('td');
+            if (typeof value === 'boolean') {
+              const checkbox = document.createElement('input');
+              checkbox.type = 'checkbox';
+              const gcn = current.data[1];
+
+              fetch(`/checkstate?gcn=${gcn}`)
+                .then((res) => res.text())
+                .then((result) => {
+                  if (result === 'true') {
+                    checkbox.checked = true;
+                  }
+                  if (result === 'false') {
+                    checkbox.checked = false;
+                  }
+                });
+
+              checkbox.addEventListener('click', () => {
+                fetch(`/changecheck?gcn=${gcn}&check=${checkbox.checked}`)
+                  .then((res) => res.text())
+                  .then((result) => {
+                    console.log('changed');
+                  });
+              });
+
+              td.appendChild(checkbox);
+            } else {
+              td.textContent = value;
+            }
+            tr.appendChild(td);
+          }
+          sheet.appendChild(tr);
+          count = count + 1;
+        }
+        current = current.node;
+      }
+    }
+
+    function changeOrder(linkedList) {
+      let tree = TreeNode(null, linkedList.data, null);
+      let currentList = linkedList.node;
+
+      while (currentList !== null) {
+        let currentTree = tree;
+        while (currentTree !== null) {
+          if (currentTree.data[0] >= currentList.data[0]) {
+            if (currentTree.left === null) {
+              currentTree.left = TreeNode(null, currentList.data, null);
+              currentTree = null;
+            } else {
+              currentTree = currentTree.left;
+            }
+          } else if (currentTree.data[0] < currentList.data[0]) {
+            if (currentTree.right === null) {
+              currentTree.right = TreeNode(null, currentList.data, null);
+              currentTree = null;
+            } else {
+              currentTree = currentTree.right;
+            }
+          }
+        }
+        currentList = currentList.node;
+      }
+      return inorderTraverse(tree).node;
+    }
+
+    function push(linkedList, data) {
+      let current = linkedList;
+      while (current.node !== null) {
+        current = current.node;
+      }
+      current.node = Node(data, null);
+    }
+
+    function inorderTraverse(tree) {
+      const linkedList = Node(null, null);
+      function func(currentTree) {
+        if (currentTree === null) return;
+
+        func(currentTree.left);
+        push(linkedList, currentTree.data);
+        func(currentTree.right);
+      }
+      func(tree);
+      return linkedList;
+    }
+
+    ['#', '호수', '학반번호', '이름', '귀사함'].forEach((string) => {
+      const th = document.createElement('th');
+      th.textContent = string;
+      tr.appendChild(th);
+    });
+
+    fetch('/dormpeople')
+      .then((res) => res.json())
+      .then((result) => {
+        let cards = Node(null, null);
+        for (let card of result) {
+          push(
+            cards,
+            Card(
+              card.room,
+              card.gcn,
+              card.name,
+              card.check === 'true' ? true : false
+            )
+          );
+        }
+
+        const information = changeOrder(cards.node);
+
+        for (let i = 0; i <= 8; i++) {
+          const floorButton = document.createElement('button');
+          floorButton.textContent = `${i}층`;
+          floor.appendChild(floorButton);
+
+          floorButton.addEventListener('click', () => {
+            removeRows();
+            changeFloor(information, i);
+          });
+        }
+
+        const firstButton = floor.querySelector('button');
+        firstButton.click();
+      });
+
+    fetch('/schoolpeople')
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+      });
+  </script>
+</html>
