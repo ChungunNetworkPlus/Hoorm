@@ -1,15 +1,59 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="icon" href="/favicon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Hoorm | 모고후 귀사 도우미</title>
     <style>
+      @font-face {
+        font-family: 'Pretendard-Bold';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff')
+          format('woff');
+      }
       td,
       th,
       table {
-        border: 1px solid black;
+        font-size: 20px;
+      }
+      td,
+      th {
+        border: 2.5px solid darkslategray;
+      }
+      table {
+        width: 100%;
+        overflow: hidden;
+        border-collapse: collapse;
+        margin-top: 30px;
+        text-align: center;
       }
       th {
         width: 100px;
+        background-color: rgb(196, 217, 255);
+      }
+      #floor {
+        display: flex;
+        gap: 0.5%;
+      }
+      h1 {
+        font-family: 'Pretendard-Bold';
+        font-size: 40px;
+      }
+      button {
+        flex: 1;
+        font-size: 30px;
+        font-family: 'Pretendard-Bold';
+        border-radius: 100px;
+        border: 2.5px solid darkslategray;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.19),
+          0 4px 13px rgba(0, 0, 0, 0.23);
+        background-color: rgb(232, 249, 255);
+        cursor: pointer;
+      }
+
+      input[type='checkbox'] {
+        width: 30px;
+        height: 30px;
       }
     </style>
   </head>

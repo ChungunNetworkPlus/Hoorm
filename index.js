@@ -84,6 +84,10 @@ app.get('/check', (req, res) => {
   res.sendFile(__dirname + '/check.html');
 });
 
+app.get('/favicon', (req, res) => {
+  res.sendFile(__dirname + '/image/favicon.ico');
+});
+
 app.listen(port);
 
 async function insert() {

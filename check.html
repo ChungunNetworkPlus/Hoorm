@@ -2,10 +2,47 @@
 <html>
   <head>
     <title>Hoorm | 모고후 귀사 도우미</title>
+    <link rel="icon" href="/favicon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      @font-face {
+        font-family: 'Pretendard-Bold';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff')
+          format('woff');
+      }
+      body {
+        text-align: center;
+      }
+      h1 {
+        font-family: 'Pretendard-Bold';
+        font-size: 40px;
+      }
+      span {
+        font-size: 30px;
+        font-family: 'Pretendard-Bold';
+      }
+      input[type='checkbox'] {
+        width: 30px;
+        height: 30px;
+      }
+
+      button {
+        font-size: 20px;
+        font-family: 'Pretendard-Bold';
+        border-radius: 100px;
+        border: 2.5px solid darkslategray;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.19),
+          0 4px 13px rgba(0, 0, 0, 0.23);
+        background-color: rgb(232, 249, 255);
+        cursor: pointer;
+        padding: 10px 30px;
+      }
+    </style>
   </head>
   <body>
     <h1></h1>
-    집에 갈래
+    <span>집에 갈래</span>
     <input type="checkbox" />
     <button>저장</button>
     <script>

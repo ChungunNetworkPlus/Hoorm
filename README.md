@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.png" alt="Hoorm Logo" width="180"/>
+  <img src="image/logo.png" alt="Hoorm Logo" width="180"/>
 </p>
 
 <p align="center"><strong>모의고사 후 귀사 도우미</strong></p>
