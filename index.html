@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoorm</title>
+    <link rel="icon" href="/favicon" />
+
+    <style>
+      @font-face {
+        font-family: 'Pretendard';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
+          format('woff');
+      }
+
+      .all {
+        background-color: rgb(198, 228, 255);
+        color: black;
+        margin: 100px 100px 0 100px;
+        font-weight: 400;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50vh;
+        border-radius: 12px;
+        font-family: 'Pretendard';
+      }
+
+      .all > * {
+        font-size: 20px !important;
+      }
+
+      .title {
+        font-size: 30px !important;
+        font-weight: 800;
+        padding: 10px;
+        margin-right: 30px;
+      }
+
+      .content {
+        font-size: 16px;
+        padding: 20px;
+      }
+
+      .checkbox {
+        margin-bottom: 18px;
+      }
+
+      .gcnall {
+        margin-bottom: 18px;
+      }
+
+      .nameall {
+        margin-bottom: 18px;
+      }
+
+      .button button {
+        color: black;
+        background-color: aliceblue;
+        cursor: pointer;
+        border: 1px solid;
+        border-radius: 2px;
+      }
+
+      .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .checkbox > input {
+        width: 20px;
+        height: 20px;
+      }
+
+      #nameinput,
+      #gcninput {
+        font-size: 20px;
+      }
+
+      button {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="all">
+      <div class="title">
+        학번번호와 이름을
+        <br />
+        입력해주세요
+      </div>
+
+      <div class="content">
+        <div class="checkbox">
+          <input type="radio" name="identity" id="checkstudent" />학생
+          <input type="radio" name="identity" id="checkcouncil" />학생회
+          <input type="radio" name="identity" id="checkteacher" />선생님
+        </div>
+
+        <div class="gcnall">
+          <div class="gcn">학반번호</div>
+          <div class="gcninput">
+            <input
+              type="number"
+              style="width: 300px"
+              id="gcninput"
+              placeholder="학생 : 학번, 나머지 : 고유코드"
+            />
+          </div>
+        </div>
+
+        <div class="nameall">
+          <div class="name">이름</div>
+          <div class="nameinput">
+            <input
+              type="text"
+              style="width: 300px"
+              id="nameinput"
+              placeholder="이름을 입력하세요"
+            />
+          </div>
+        </div>
+        <div class="button">
+          <button>확인</button>
+        </div>
+      </div>
+    </div>
+    <div class="logo-container">
+      <img src="/hoorm" alt="Hoorm 로고" width="400px" />
+    </div>
+
+    <script>
+      fetch('/allpeople')
+        .then((res) => res.json())
+        .then((array) => {
+          console.log(array);
+          function checkMatch(gcnInput, nameInput) {
+            const result = array.find((obj) => obj.gcn === Number(gcnInput));
+            console.log(result, gcnInput);
+
+            if (!result) {
+              return '해당 학반번호를 가진 학생이 없습니다.';
+            }
+
+            if (result.name !== nameInput) {
+              return '이름이 일치하지 않습니다.';
+            } else {
+              return '이름이 일치합니다.';
+            }
+          }
+
+          function inputfuction() {
+            const checkValue = document.getElementById('checkstudent').checked;
+            const checkCouncil =
+              document.getElementById('checkcouncil').checked;
+            const checkTeacher =
+              document.getElementById('checkteacher').checked;
+            if (checkValue) {
+              const gcnelement = document.getElementById('gcninput');
+              const gcnvalue = gcnelement.value;
+              const gcnNumber = Number(gcnvalue);
+              if (gcnNumber <= 10101 || gcnNumber >= 30731) {
+                alert('학번이 옳지 못합 입력입니다.');
+              }
+              const nameValue = document.getElementById('nameinput').value;
+              const result = checkMatch(gcnvalue, nameValue);
+              alert(result);
+              if (result === '이름이 일치합니다.') {
+                checkStudent();
+              }
+            } else if (checkCouncil) {
+              const gcnelement = document.getElementById('gcninput');
+              const gcnvalue = gcnelement.value;
+              const gcnNumber = Number(gcnvalue);
+              if (gcnNumber !== 794613) {
+                alert('옳지 못한 코드입니다.');
+              }
+              const nameValue = document.getElementById('nameinput').value;
+              if (nameValue !== '권효주') {
+                alert('옳지 못한 이름입니다.');
+              }
+
+              if (gcnNumber === 794613 && nameValue === '권효주') {
+                window.location.href = '/dorm';
+              }
+            } else if (checkTeacher) {
+              const gcnelement = document.getElementById('gcninput');
+              const gcnvalue = gcnelement.value;
+              const gcnNumber = Number(gcnvalue);
+              if (gcnNumber !== 794613) {
+                alert('옳지 못한 코드입니다.');
+              }
+              const nameValue = document.getElementById('nameinput').value;
+              if (nameValue !== '선생님') {
+                alert('옳지 못한 이름입니다.');
+              }
+
+              if (gcnNumber === 794613 && nameValue === '선생님') {
+                window.location.href = '/teacher';
+              }
+            }
+          }
+
+          function checkStudent() {
+            const gcn = document.getElementById('gcninput').value.trim();
+            const name = document.getElementById('nameinput').value.trim();
+
+            window.location.href = `/check?gcn=${gcn}&name=${name}`;
+          }
+
+          document
+            .querySelector('button')
+            .addEventListener('click', inputfuction);
+        });
+    </script>
+  </body>
+</html>

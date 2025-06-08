@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoorm 선생님용 화면</title>
+    <style>
+      @font-face {
+        font-family: 'Pretendard';
+        src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff')
+          format('woff');
+      }
+      .title {
+        font-family: 'Pretendard';
+        font-size: 40px;
+        font-weight: 800;
+      }
+
+      .select {
+        font-family: 'Pretendard';
+        font-size: 15px;
+        font-weight: 300;
+      }
+
+      .warning {
+        font-family: 'Pretendard';
+        font-size: 15px;
+        font-weight: 300;
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="title">선생님 화면 - 학교에 남아있는 학생들 목록</div>
+    <br />
+    <div class="select">
+      <label for="gradeSelect">학년 선택:</label>
+      <select id="gradeSelect" style="margin-right: 16px">
+        <option value="">--</option>
+        <option value="1">1학년</option>
+        <option value="2">2학년</option>
+        <option value="3">3학년</option>
+      </select>
+
+      <label for="classSelect">반 선택:</label>
+      <select id="classSelect" style="margin-right: 16px">
+        <option value="">--</option>
+        <option value="1">1반</option>
+        <option value="2">2반</option>
+        <option value="3">3반</option>
+        <option value="4">4반</option>
+        <option value="5">5반</option>
+        <option value="6">6반</option>
+        <option value="7">7반</option>
+      </select>
+
+      <button onclick="orderTable()">확인</button>
+
+      <div class="warning">*학년이랑 반 모두 다 선택해야 뜹니다!!</div>
+    </div>
+
+    <br />
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>학반번호</th>
+          <th>이름</th>
+        </tr>
+      </thead>
+      <tbody id="table"></tbody>
+    </table>
+
+    <script>
+      let root = null;
+
+      fetch('/schoolpeople')
+        .then((res) => res.json())
+        .then((result) => {
+          console.log(result.filter((v) => v.gcn === 20101));
+
+          for (let i = 0; i < result.length; i++) {
+            root = insert(root, result[i]);
+          }
+        });
+
+      class Node {
+        constructor(value) {
+          this.value = value;
+          this.left = null;
+          this.right = null;
+        }
+      }
+
+      function insert(root, value) {
+        if (!root) return new Node(value);
+        if (value.gcn < root.value.gcn) {
+          root.left = insert(root.left, value);
+        } else {
+          root.right = insert(root.right, value);
+        }
+        return root;
+      }
+
+      function order(node, tbody, filter) {
+        if (!node) return;
+        order(node.left, tbody, filter);
+
+        if (String(node.value.gcn).startsWith(filter)) {
+          const row = document.createElement('tr');
+          const gcncell = document.createElement('td');
+          gcncell.textContent = node.value.gcn;
+          const namecell = document.createElement('td');
+          namecell.textContent = node.value.name;
+          console.log(node.value);
+
+          row.appendChild(gcncell);
+          row.appendChild(namecell);
+          tbody.appendChild(row);
+        }
+
+        order(node.right, tbody, filter);
+      }
+
+      function orderTable() {
+        const grade = document.getElementById('gradeSelect').value;
+        const classes = document.getElementById('classSelect').value;
+
+        if (!grade || !classes) return;
+
+        const filter = `${String(grade)}${String(classes).padStart(2, '0')}`;
+        const tbody = document.querySelector('tbody');
+
+        tbody.innerHTML = '';
+        order(root, tbody, filter);
+      }
+    </script>
+  </body>
+</html>
