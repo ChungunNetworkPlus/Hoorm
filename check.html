@@ -76,6 +76,7 @@
         fetch(`/changewhere?gcn=${gcn}&check=${checkbox.checked}`)
           .then((res) => res.text())
           .then((result) => {
+            alert('저장되었습니다!');
             console.log('changed');
           });
       });

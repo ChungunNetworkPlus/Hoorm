@@ -55,10 +55,29 @@
         width: 30px;
         height: 30px;
       }
+
+      #SUPERDUPERIMPORTANT {
+        all: unset !important;
+        background-color: gray !important;
+        color: red !important;
+        font-size: 30px !important;
+      }
     </style>
   </head>
   <body>
     <h1>Hoorm | 모고후 귀사 도우미</h1>
+    <button id="SUPERDUPERIMPORTANT">모든 학생의 귀사 여부 초기화!!</button>
+    <br /><br /><br /><br /><br />
+    <form>
+      <label
+        ><input type="radio" name="allowchange" value="설문허용" />설문
+        허용</label
+      >
+      <label
+        ><input type="radio" name="allowchange" value="설문불허" />설문
+        불거</label
+      >
+    </form>
     <div id="floor"></div>
     <table id="sheet">
       <tr id="tr"></tr>
@@ -68,6 +87,34 @@
     const floor = document.querySelector('#floor');
     const sheet = document.querySelector('#sheet tbody');
     const tr = document.querySelector('#tr');
+    const SUPERDUPERIMPORTANT = document.querySelector('#SUPERDUPERIMPORTANT');
+    const allowchanges = document.querySelectorAll("input[name='allowchange']");
+
+    fetch('currentallow')
+      .then((res) => res.text())
+      .then((result) => {
+        if (result === 'yes') {
+          allowchanges[0].click();
+        }
+        if (result === 'no') {
+          allowchanges[1].click();
+        }
+        allowchanges.forEach((allowchange) => {
+          allowchange.addEventListener('change', (e) => {
+            if (e.target.checked) {
+              fetch(`allowchange?state=${e.target.value}`).then(() => {
+                alert('상태 변경됨');
+              });
+            }
+          });
+        });
+      });
+
+    SUPERDUPERIMPORTANT.addEventListener('click', () => {
+      fetch('/resetall').then(() => {
+        alert('I am inevitable~');
+      });
+    });
 
     function Card(roomnum, gcn, name, back) {
       return [roomnum, gcn, name, back];

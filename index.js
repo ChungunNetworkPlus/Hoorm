@@ -80,20 +80,75 @@ app.get('/allpeople', async (req, res) => {
   res.send(datas);
 });
 
+app.get('/resetall', async (req, res) => {
+  const { data: ids } = await supabase.from('hoorm_students').select('id');
+  ids.forEach(async (array) => {
+    await supabase
+      .from('hoorm_students')
+      .update({ where: 'school', check: 'false' })
+      .eq('id', array.id);
+  });
+
+  res.send('done');
+});
+
+app.get('/allowchange', async (req, res) => {
+  const state = req.query.state;
+  await supabase
+    .from('hoorm_allow')
+    .update({ allowchange: state === '설문허용' ? 'yes' : 'no' })
+    .eq('id', 1);
+  res.send('done');
+});
+
+app.get('/currentallow', async (req, res) => {
+  const { data: datas } = await supabase.from('hoorm_allow').select('*');
+  res.send(datas[0].allowchange);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
 
 app.get('/dorm', (req, res) => {
-  res.sendFile(__dirname + '/dorm.html');
+  const code = 'hcu_khj_studentcouncil!!';
+  const pw = req.query.pw;
+  if (code === pw) {
+    res.sendFile(__dirname + '/dorm.html');
+  } else {
+    res.redirect(req.get('Referer') || '/');
+  }
 });
 
-app.get('/check', (req, res) => {
-  res.sendFile(__dirname + '/check.html');
+app.get('/check', async (req, res) => {
+  const gcn = req.query.gcn;
+  const name = req.query.name;
+  const { data: datas } = await supabase
+    .from('hoorm_students')
+    .select('*')
+    .eq('gcn', gcn)
+    .eq('name', name);
+  const { data: allow } = await supabase.from('hoorm_allow').select('*');
+
+  if (allow[0].allowchange === 'yes') {
+    if (datas.length === 0) {
+      res.sendFile(__dirname + '/error.html');
+    } else {
+      res.sendFile(__dirname + '/check.html');
+    }
+  } else {
+    res.sendFile(__dirname + '/deadline.html');
+  }
 });
 
 app.get('/teacher', (req, res) => {
-  res.sendFile(__dirname + '/teacher.html');
+  const code = 'hcu_khj_teacher!!';
+  const pw = req.query.pw;
+  if (code === pw) {
+    res.sendFile(__dirname + '/teacher.html');
+  } else {
+    res.redirect(req.get('Referer') || '/');
+  }
 });
 
 app.get('/favicon', (req, res) => {
