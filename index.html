@@ -6,6 +6,7 @@
     <link rel="icon" href="/favicon" />
 
     <title>Hoorm</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
       @font-face {
         font-family: 'GmarketSansMedium';
@@ -93,14 +94,42 @@
       #input-group {
         display: none;
       }
+
+      #login {
+        display: flex;
+        gap: 10px;
+      }
     </style>
   </head>
   <body>
+    <div
+      id="g_id_onload"
+      data-client_id="968179955551-ihoe25vh1ls7quuomf7epvnltr4f3l64.apps.googleusercontent.com"
+      data-callback="handleCredentialResponse"
+      data-auto_select="false"
+      data-itp_support="true"
+    ></div>
+
     <div class="logo-container">
       <img src="/hoorm" alt="Hoorm 로고" width="150" />
       <div class="programmer">
         made by 44대 생활부장 권효주, 2024 웹진 제작자 윤동현
       </div>
+    </div>
+
+    <div id="login">
+      <div>필히 학교 계정으로 로그인 하시오!!</div>
+      <div
+        class="g_id_signin"
+        data-type="standard"
+        data-shape="pill"
+        data-theme="outline"
+        data-text="signin_with"
+        data-size="large"
+        data-logo_alignment="left"
+      ></div>
+      <p id="userEmail"></p>
+      <p id="userName"></p>
     </div>
 
     <div class="all">
@@ -141,6 +170,29 @@
     </div>
 
     <script>
+      let myname = '';
+      function handleCredentialResponse(response) {
+        // 1. ID Token (JWT) 받음
+        const token = response.credential;
+
+        // 2. 토큰 디코드 (header.payload.signature 중 payload 부분 base64 decode)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log(payload);
+
+        // 3. 화면에 사용자 정보 표시
+        document.getElementById('userName').textContent = payload.name;
+        document.getElementById('userEmail').textContent = payload.email;
+
+        document.getElementById('userInfo').style.display = 'block';
+
+        if (payload.email.includes('@hcu.hs.kr')) {
+          myname = payload.name;
+        } else {
+          alert('학교 계정으로 로그인하시오');
+          location.reload();
+        }
+      }
+
       const radios = document.querySelectorAll('input[name="identity"]');
       const inputGroup = document.getElementById('input-group');
       const inputName = document.querySelector('.input-name');
@@ -198,6 +250,10 @@
                 .getElementById('nameinput')
                 .value.trim();
               if (!nameValue) return alert('이름을 입력해주세요.');
+              if (nameValue !== myname) {
+                alert('너 누구냐!');
+                location.reload();
+              }
               const result = checkMatch(gcnValue, nameValue);
               alert(result);
               if (result === '이름이 일치합니다.') {
