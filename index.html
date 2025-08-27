@@ -171,20 +171,24 @@
 
     <script>
       let myname = '';
-      function parseJwt(token) {
-        // JWT payload 부분 (두 번째) 추출
-        let base64Url = token.split('.')[1];
-
-        // Base64URL → Base64
+      function base64UrlDecodeUtf8(base64Url) {
+        // 1. Base64URL → Base64
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4) base64 += '=';
 
-        // 패딩 추가
-        while (base64.length % 4) {
-          base64 += '=';
-        }
+        // 2. atob로 디코딩 → Latin1 문자열
+        let binary = atob(base64);
 
-        // 디코딩
-        return JSON.parse(atob(base64));
+        // 3. Latin1 → UTF-8
+        let bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
+        let decoded = new TextDecoder().decode(bytes);
+
+        return decoded;
+      }
+
+      function parseJwt(token) {
+        let payload = token.split('.')[1];
+        return JSON.parse(base64UrlDecodeUtf8(payload));
       }
       function handleCredentialResponse(response) {
         // 1. ID Token (JWT) 받음
