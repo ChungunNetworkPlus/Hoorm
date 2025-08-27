@@ -277,7 +277,11 @@
               const result = checkMatch(gcnValue, nameValue);
               alert(result);
               if (result === '이름이 일치합니다.') {
-                window.location.href = `/check?gcn=${gcninput.value}&name=${nameinput.value}`;
+                window.location.href = `/check?gcn=${gcninput.value}&name=${
+                  nameinput.value
+                }&secret=${((Number(gcninput.value) - 1234) ** 2 / 7).toFixed(
+                  0
+                )}`;
               }
             } else if (isCouncil) {
               window.location.href = `/dorm?pw=${gcnValue}`;

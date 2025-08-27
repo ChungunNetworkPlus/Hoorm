@@ -123,6 +123,7 @@ app.get('/dorm', (req, res) => {
 app.get('/check', async (req, res) => {
   const gcn = req.query.gcn;
   const name = req.query.name;
+  const secret = req.query.secret;
   const { data: datas } = await supabase
     .from('hoorm_students')
     .select('*')
@@ -134,7 +135,11 @@ app.get('/check', async (req, res) => {
     if (datas.length === 0) {
       res.sendFile(__dirname + '/error.html');
     } else {
-      res.sendFile(__dirname + '/check.html');
+      if (((Number(gcn) - 1234) ** 2 / 7).toFixed(0) === secret) {
+        res.sendFile(__dirname + '/check.html');
+      } else {
+        res.sendFile(__dirname + '/error.html');
+      }
     }
   } else {
     res.sendFile(__dirname + '/deadline.html');
